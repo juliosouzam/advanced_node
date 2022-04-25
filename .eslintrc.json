@@ -56,7 +56,8 @@
     "import/no-extraneous-dependencies": [
       "error",
       { "devDependencies": ["**/*.spec.js"] }
-    ]
+    ],
+    "@typescript-eslint/no-namespace": "off"
   },
   "settings": {
     "import/resolver": {
