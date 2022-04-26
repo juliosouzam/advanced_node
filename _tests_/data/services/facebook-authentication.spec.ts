@@ -1,14 +1,19 @@
 // eslint-disable-next-line max-classes-per-file
+import { AuthenticationError } from '@/domain/errors';
 import { IFacebookAuthentication } from '@/domain/features';
 
 interface ILoadFacebookUserApi {
-  loadUser(params: ILoadFacebookUserApi.Params): Promise<void>;
+  loadUser(
+    params: ILoadFacebookUserApi.Params,
+  ): Promise<ILoadFacebookUserApi.Result>;
 }
 
 namespace ILoadFacebookUserApi {
   export type Params = {
     token: string;
   };
+
+  export type Result = undefined;
 }
 
 class FacebookAuthenticationService {
@@ -16,15 +21,25 @@ class FacebookAuthenticationService {
     //
   }
 
-  async perform(params: IFacebookAuthentication.Params): Promise<void> {
+  async perform(
+    params: IFacebookAuthentication.Params,
+  ): Promise<AuthenticationError> {
     await this.loadFacebookUserApi.loadUser(params);
+
+    return new AuthenticationError();
   }
 }
 
 class ILoadFacebookUserApiSpy implements ILoadFacebookUserApi {
   token?: string;
-  async loadUser(params: ILoadFacebookUserApi.Params): Promise<void> {
+  result = undefined;
+
+  async loadUser(
+    params: ILoadFacebookUserApi.Params,
+  ): Promise<ILoadFacebookUserApi.Result> {
     this.token = params.token;
+
+    return this.result;
   }
 }
 
@@ -37,5 +52,16 @@ describe('Facebook Authentication Service', () => {
     await sut.perform({ token });
 
     expect(loadFacebookUserApi.token).toBe(token);
+  });
+
+  test('should return AuthenticationError when LoadFacebookUserApi returns undefined', async () => {
+    const loadFacebookUserApi = new ILoadFacebookUserApiSpy();
+    loadFacebookUserApi.result = undefined;
+    const sut = new FacebookAuthenticationService(loadFacebookUserApi);
+    const token = 'any_token';
+
+    const authResult = await sut.perform({ token });
+
+    expect(authResult).toEqual(new AuthenticationError());
   });
 });
