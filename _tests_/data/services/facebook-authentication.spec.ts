@@ -1,23 +1,9 @@
 // eslint-disable-next-line max-classes-per-file
 import { ILoadFacebookUserApi } from '@/data/contracts/apis';
+import { FacebookAuthenticationService } from '@/data/services';
 import { AuthenticationError } from '@/domain/errors';
-import { IFacebookAuthentication } from '@/domain/features';
 
-class FacebookAuthenticationService {
-  constructor(private readonly loadFacebookUserApi: ILoadFacebookUserApi) {
-    //
-  }
-
-  async perform(
-    params: IFacebookAuthentication.Params,
-  ): Promise<AuthenticationError> {
-    await this.loadFacebookUserApi.loadUser(params);
-
-    return new AuthenticationError();
-  }
-}
-
-class ILoadFacebookUserApiSpy implements ILoadFacebookUserApi {
+class LoadFacebookUserApiSpy implements ILoadFacebookUserApi {
   token?: string;
   result = undefined;
 
@@ -32,7 +18,7 @@ class ILoadFacebookUserApiSpy implements ILoadFacebookUserApi {
 
 describe('Facebook Authentication Service', () => {
   test('should call LoadFacebookUserApi with correct params', async () => {
-    const loadFacebookUserApi = new ILoadFacebookUserApiSpy();
+    const loadFacebookUserApi = new LoadFacebookUserApiSpy();
     const sut = new FacebookAuthenticationService(loadFacebookUserApi);
     const token = 'any_token';
 
@@ -42,7 +28,7 @@ describe('Facebook Authentication Service', () => {
   });
 
   test('should return AuthenticationError when LoadFacebookUserApi returns undefined', async () => {
-    const loadFacebookUserApi = new ILoadFacebookUserApiSpy();
+    const loadFacebookUserApi = new LoadFacebookUserApiSpy();
     loadFacebookUserApi.result = undefined;
     const sut = new FacebookAuthenticationService(loadFacebookUserApi);
     const token = 'any_token';
