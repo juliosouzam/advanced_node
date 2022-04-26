@@ -1,16 +1,16 @@
 import { AuthenticationError } from '../errors';
 import { AccessToken } from '../models';
 
-namespace IFacebookAuthentication {
+export namespace IFacebookAuthentication {
   export type Params = {
-    accessToken: string;
+    token: string;
   };
 
   export type Result = AccessToken | AuthenticationError;
 }
 
 export interface IFacebookAuthentication {
-  perform: (
+  perform(
     params: IFacebookAuthentication.Params,
-  ) => Promise<IFacebookAuthentication.Result>;
+  ): Promise<IFacebookAuthentication.Result>;
 }
